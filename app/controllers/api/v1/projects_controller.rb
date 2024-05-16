@@ -26,8 +26,10 @@ module Api
           :id,
           :name,
           evaluations: [
+            :id,
             :title,
             grades: [
+              :id,
               :score,
               criteria: [
                 :id

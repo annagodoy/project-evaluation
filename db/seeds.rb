@@ -6,7 +6,7 @@ Criterion.create(weight: 3.0)
 Criterion.create(weight: 2.0)
 Criterion.create(weight: 1.0)
 
-100.times do 
+10.times do 
   Project.create(name: "#{Faker::Space.meteorite} - #{rand(1..99)}")
 end
 

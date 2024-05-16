@@ -18,44 +18,49 @@ class CreateOrUpdateProject
       @project = Project.create(name: context.name)
     end
 
-    create_projetc_evaluations
+    create_or_update_project_evaluations
   end
 
-  def create_projetc_evaluations
+  def create_or_update_project_evaluations
     context.evaluations.each do |evaluation_params|
-      new_evaluation = project.evaluations.create(title: evaluation_params[:title])
+      evaluation = project.evaluations.find_or_create_by(id: evaluation_params[:id])
 
-      create_evaluation_grades(evaluation_params, new_evaluation)
-
-      calculate_weighted_score(new_evaluation)
-
+      evaluation.update_attribute('title', evaluation_params[:title])
+      evaluation_grades(evaluation_params, evaluation)
+      calculate_weighted_score(evaluation)
       calculate_project_score
 
       context.project = project
     end
   end
 
-  def create_evaluation_grades(params, new_evaluation)
+  def evaluation_grades(params, evaluation)
     params[:grades].each do |grade|
-      new_evaluation.grades.create(
-        score: grade[:score].to_f.round(2),
-        criterion_id: grade[:criteria][:id]
-      )
+      evaluation.grades.find_or_initialize_by(id: grade[:id]).tap do |g|
+
+        g.score = grade[:score].to_f.round(2)
+
+        if g.new_record?
+          g.criterion_id = grade[:criteria][:id]
+        end
+
+        g.save
+      end
     end
   end
 
-  def calculate_weighted_score(new_evaluation)
+  def calculate_weighted_score(evaluation)
     formula  = 0
     criteria = 0
 
-    new_evaluation.grades.each do |grade|
+    evaluation.grades.each do |grade|
       formula   += grade.score * grade.criterion.weight
       criteria  += grade.criterion.weight
     end
 
     weighted_score = (formula / criteria).round(2)
 
-    new_evaluation.update_attribute('weighted_score', weighted_score)
+    evaluation.update_attribute('weighted_score', weighted_score)
   end
 
   def calculate_project_score

@@ -49,3 +49,5 @@ end
 gem 'faker'
 gem 'interactor'
 gem 'kaminari'
+gem 'rspec-rails'
+gem 'factory_bot_rails'

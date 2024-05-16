@@ -16,21 +16,22 @@ class CreateOrUpdateProject
   def save_project
     if project.blank?
       @project = Project.create(name: context.name)
+    else
+      project.update_attribute('name', context.name)
     end
 
     create_or_update_project_evaluations
+    context.project = project
   end
 
   def create_or_update_project_evaluations
-    context.evaluations.each do |evaluation_params|
+    context.evaluations&.each do |evaluation_params|
       evaluation = project.evaluations.find_or_create_by(id: evaluation_params[:id])
 
       evaluation.update_attribute('title', evaluation_params[:title])
       evaluation_grades(evaluation_params, evaluation)
       calculate_weighted_score(evaluation)
       calculate_project_score
-
-      context.project = project
     end
   end
 

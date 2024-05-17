@@ -1,9 +1,10 @@
 module Api
   module V1
     class ProjectsController < ApplicationController
-      before_action :get_projects, only: [:index]
 
       def index
+        projects = Project.all.order(name: :asc)
+
         result = Kaminari.paginate_array(
           ProjectSerializer.wrap(projects),
           total_count: projects.count
@@ -21,8 +22,6 @@ module Api
 
       def project_params
         params.require(:project).permit(
-          :page,
-          :size,
           :id,
           :name,
           evaluations: [
@@ -37,10 +36,6 @@ module Api
             ]
           ]
         )
-      end
-
-      def get_projects
-        projects = Project.all.order(name: :asc)
       end
     end
   end

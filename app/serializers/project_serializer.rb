@@ -2,7 +2,7 @@ class ProjectSerializer < SimpleDelegator
   attr_reader :project
 
   def initialize(project=nil)
-    @project     = project
+    @project = project
     __setobj__(project)
   end
 
